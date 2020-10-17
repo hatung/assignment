@@ -2,49 +2,61 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
 </p>
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+### Place Order Process
+Customer create an **order** with **total**. The new order will be processed automaticaly via a payment service with total, if total is odd number (2,4,6,8), it will be **approved** and sent to Deliver department after 3 seconds. If total order is even numbers (1,3,5,7), the order will be canceled.
 
-## Description
+Customers can see all their orders if an order still is not **delivered** they can **cancel** it.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Design Approach 
+###  Domain-Driven Design (DDD)
+The method to create a common sharing knowleage about business domain between developer and domain experts. The problem when building a large software in enterprise is developer have a little understand the business words, business processes. They will describe the business into thier own language. By the limitation of programming language, OOP, DB nomalization to describe the business, the output by developer does not reflect the real world.
+Using or applying DDD from spec creatation to coding we can create a common language, understandable for both domain experts and developer
+
+### User Process Mapping 
+
+![The Process Mapping ](/docs/ddd-process-mapping.png)
+
+Use DDD methodology to identify AggregateRoot, Enities, Domain Events, Bounded Context and Context map.
+## The Architecture
+![The Big picture](/docs/thebigpicture.png)
+
+Apply Event Sourcing and CQRS architect parttern 
+## Event Driven Orchestration
+
+![Event Driven](/docs/event-orchestration.png)
+
+Use Event Driven to make mircroservers loosing couple.
+
 
 ## Installation
 
 ```bash
 $ npm install
 ```
-
-## Running the app
+## Start Mongo & RabbitMQ
+```bash
+$ docker-compose up -d
+```
+## Running the Order Service
 
 ```bash
+cd order
 # development
 $ npm run start
 
 # watch mode
 $ npm run start:dev
 
-# production mode
-$ npm run start:prod
+# Replay all history events and update query side 
+$ npm run start:viewdb
+
+```
+## Running the Order Service
+```bash
+$ cd payment
+# development
+$ npm run start
+
 ```
 
 ## Test
@@ -52,23 +64,34 @@ $ npm run start:prod
 ```bash
 # unit tests
 $ npm run test
+```
+### Endpoints:
+Create Order
+POST
+```
+http://localhost:3000/order/
 
-# e2e tests
-$ npm run test:e2e
+{
+    "user_id": "test_user",
+    "total": 2
+}
+```
+Cancel Order
+PUT
+```
+http://localhost:3000/order/cancel
 
-# test coverage
-$ npm run test:cov
+{
+    "id": "56f9222e-f731-47b8-aeb7-66112ca511d0",
+}
 ```
 
-## Support
+## Next
+- Make Dokerfile
+- Deploy to Kubernestes environment (Helm chart)
+- Make service mesh (Istio) and log monitering
+- Make CloudFomation file with EKS
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 

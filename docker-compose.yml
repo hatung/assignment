@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+  # order:
+  #   container_name: order:dev
+  #   build:
+  #     context: ./order
+  #     target: builder
+  #   volumes:
+  #    - ./order:/usr/src/app
+  #    - /usr/src/app/node_modules
+  #   ports:
+  #    - "3000:3000"
+  #     #- 9229:9229
+  #   command: npm run start:dev
+  #   env_file:
+  #     - .env
+  #   networks:
+  #    - webnet
+  # payment:
+  #   container_name: payment:dev
+  #   build:
+  #     context: ./payment
+  #     target: builder
+  #   volumes:
+  #    - ./payment:/usr/src/app
+  #    - /usr/src/app/node_modules
+  #   ports:
+  #    - "3000:3000"
+  #     #- 9229:9229
+  #   command: npm run start:dev
+  #   env_file:
+  #     - .env
+  #   networks:
+  #    - webnet
+
+  mongodb:
+    image: 'mongo'
+    volumes:
+     - ./mongodb:/data/db
+    ports:
+     - "27017:27017"
+     - "27018:27018"
+     - "27019:27019"
+  
+  rabbit1:
+    image: "rabbitmq:3-management"
+    hostname: "rabbit1"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq1"
+    volumes:
+      - "./rabbitmq/enabled_plugins:/etc/rabbitmq/enabled_plugins"
+      #- "./rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro"
+      #- "./autocluster-0.4.1.ez:/usr/lib/rabbitmq/lib/rabbitmq_server-3.5.5/plugins/autocluster-0.4.1.ez"
+  
+networks:
+  webnet:

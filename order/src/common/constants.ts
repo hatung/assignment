@@ -1,0 +1,2 @@
+export const ORDER_MODEL = 'ORDER_MODEL';
+export const PAYMENT_SERVICE = 'PAYMENT_SERVICE';
